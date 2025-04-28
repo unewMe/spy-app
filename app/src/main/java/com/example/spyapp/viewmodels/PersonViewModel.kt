@@ -43,4 +43,16 @@ class PersonViewModel : ViewModel() {
             }
         }
     }
+    
+    // Upload avatar image for a person
+    fun uploadAvatar(personId: String, imageData: ByteArray, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val downloadUrl = repository.uploadPersonAvatar(personId, imageData)
+                onResult(true, downloadUrl)
+            } catch (e: Exception) {
+                onResult(false, e.message)
+            }
+        }
+    }
 }

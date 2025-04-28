@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.spyapp.api.InvitationRepository
 import com.example.spyapp.api.PartnersRepository
 import com.example.spyapp.models.Invitation
+import com.example.spyapp.models.Partner
 import com.example.spyapp.models.Person
 import com.example.spyapp.models.User
 import com.google.firebase.auth.FirebaseAuth
@@ -24,8 +25,8 @@ class AccountViewModel : ViewModel() {
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
     
-    private val _partners = MutableStateFlow<List<Person>>(emptyList())
-    val partners: StateFlow<List<Person>> = _partners.asStateFlow()
+    private val _partners = MutableStateFlow<List<Partner>>(emptyList())
+    val partners: StateFlow<List<Partner>> = _partners.asStateFlow()
     
     private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
     val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()

@@ -1,6 +1,9 @@
 package com.example.spyapp.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -8,17 +11,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.spyapp.models.Person
-
-
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonDetailScreen(person: Person, onBack: () -> Unit, onEdit: (Person) -> Unit, onGallery: () -> Unit, onRecordings: () -> Unit, onNotes: () -> Unit) {
     val navController = rememberNavController()
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     Scaffold(
         topBar = {
@@ -44,29 +51,54 @@ fun PersonDetailScreen(person: Person, onBack: () -> Unit, onEdit: (Person) -> U
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(
-                Icons.Default.AccountCircle,
-                contentDescription = null,
-                modifier = Modifier.size(100.dp),
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
-            )
+            // Display avatar image if available, otherwise show a placeholder
+            if (person.photoUrl.isNotEmpty()) {
+                Image(
+                    painter = rememberAsyncImagePainter(person.photoUrl),
+                    contentDescription = "Avatar",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    Icons.Default.AccountCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(120.dp),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                )
+            }
+            
             Spacer(modifier = Modifier.height(16.dp))
             Text(person.name, fontSize = 24.sp)
             Spacer(modifier = Modifier.height(16.dp))
             Divider()
             Spacer(modifier = Modifier.height(16.dp))
+            
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.DateRange, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("person.birthdate")
+                // Format the birthdate properly
+                val birthdateText = if (person.birthdate > 0) {
+                    dateFormat.format(Date(person.birthdate))
+                } else {
+                    "Not specified"
+                }
+                Text(birthdateText, fontSize = 16.sp)
             }
+            
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Email, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(person.email, fontSize = 24.sp)
+                Text(
+                    text = person.email.ifEmpty { "No email" }, 
+                    fontSize = 16.sp
+                )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             ButtonList(onGallery, onRecordings, onNotes)
         }
     }

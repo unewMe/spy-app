@@ -1,6 +1,7 @@
 package com.example.spyapp.api
 
 import com.example.spyapp.models.Invitation
+import com.example.spyapp.utils.FirestoreCollections
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
@@ -11,8 +12,8 @@ class InvitationRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    // Wysyłanie zaproszenia – dodaje dokument w kolekcji "invitations" odbiorcy.
-    // W tym rozwiązaniu zaproszenie jest zapisywane w dokumentach nadawcy, a odbiorca pobiera je z kolekcji "invitations" w swoim dokumencie.
+    // Wysyłanie zaproszenia – dodaje dokument w kolekcji "invitations"
+    // W tym rozwiązaniu zaproszenie jest zapisywane bezpośrednio w kolekcji "invitations"
     suspend fun sendInvitation(toEmail: String) {
         val currentUser = auth.currentUser ?: throw Exception("User not authenticated")
         val invitation = Invitation(
@@ -21,9 +22,9 @@ class InvitationRepository {
             toEmail = toEmail,
             timestamp = System.currentTimeMillis()
         )
-        firestore.collection("users")
-            .document(currentUser.uid)
-            .collection("sentInvitations")
+        
+        // Zapisujemy zaproszenie w kolekcji głównej
+        firestore.collection(FirestoreCollections.INVITATIONS)
             .add(invitation)
             .await()
     }
@@ -33,10 +34,11 @@ class InvitationRepository {
             close(Exception("User not authenticated"))
             return@callbackFlow
         }
-        // Zakładamy, że odbiorca ma zaproszenia zapisane w kolekcji "invitations" w swoim dokumencie
-        val invitationsRef = firestore.collection("users")
-            .document(currentUser.uid)
-            .collection("invitations")
+        
+        // Pobieramy zaproszenia z kolekcji głównej filtrując po emailu odbiorcy
+        val invitationsRef = firestore.collection(FirestoreCollections.INVITATIONS)
+            .whereEqualTo("toEmail", currentUser.email)
+            
         val subscription = invitationsRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 close(error)
@@ -53,28 +55,31 @@ class InvitationRepository {
         awaitClose { subscription.remove() }
     }
 
-    // Akceptacja zaproszenia – dodajemy partnera do obu kolekcji
+    // Akceptacja zaproszenia – dodajemy partnera do kolekcji partners
     suspend fun acceptInvitation(invitation: Invitation) {
         val currentUser = auth.currentUser ?: throw Exception("User not authenticated")
+        
         // Dodajemy nadawcę jako partnera u odbiorcy
-        firestore.collection("users")
-            .document(currentUser.uid)
-            .collection("partners")
-            .document(invitation.fromUserId)
-            .set(mapOf("email" to invitation.fromEmail))
+        firestore.collection(FirestoreCollections.PARTNERS)
+            .add(mapOf(
+                "userId" to currentUser.uid,
+                "partnerId" to invitation.fromUserId,
+                "partnerEmail" to invitation.fromEmail
+            ))
             .await()
+            
         // Dodajemy odbiorcę jako partnera u nadawcy
         val currentEmail = currentUser.email ?: ""
-        firestore.collection("users")
-            .document(invitation.fromUserId)
-            .collection("partners")
-            .document(currentUser.uid)
-            .set(mapOf("email" to currentEmail))
+        firestore.collection(FirestoreCollections.PARTNERS)
+            .add(mapOf(
+                "userId" to invitation.fromUserId,
+                "partnerId" to currentUser.uid,
+                "partnerEmail" to currentEmail
+            ))
             .await()
-        // Usuwamy zaproszenie – z odbiorcy
-        firestore.collection("users")
-            .document(currentUser.uid)
-            .collection("invitations")
+            
+        // Usuwamy zaproszenie
+        firestore.collection(FirestoreCollections.INVITATIONS)
             .document(invitation.id)
             .delete()
             .await()
@@ -83,9 +88,7 @@ class InvitationRepository {
     // Odrzucenie zaproszenia
     suspend fun rejectInvitation(invitation: Invitation) {
         val currentUser = auth.currentUser ?: throw Exception("User not authenticated")
-        firestore.collection("users")
-            .document(currentUser.uid)
-            .collection("invitations")
+        firestore.collection(FirestoreCollections.INVITATIONS)
             .document(invitation.id)
             .delete()
             .await()

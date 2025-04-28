@@ -2,6 +2,7 @@ package com.example.spyapp.models
 
 data class Person(
     val id: String = "",
+    val userId: String = "", // Added userId field for top-level collection
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",

@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spyapp.R
 import com.example.spyapp.models.Invitation
+import com.example.spyapp.models.Partner
 import com.example.spyapp.models.Person
 import com.example.spyapp.models.User
 import com.example.spyapp.viewmodels.AccountViewModel
@@ -149,9 +150,9 @@ fun AccountScreen(
 
 @Composable
 private fun PartnersSection(
-    partners: List<Person>,
+    partners: List<Partner>,
     onAddPartner: () -> Unit,
-    onSelectPartner: (Person) -> Unit
+    onSelectPartner: (Partner) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -205,7 +206,7 @@ private fun PartnersSection(
 
 @Composable
 private fun PartnerItem(
-    partner: Person,
+    partner: Partner,
     onClick: () -> Unit
 ) {
     Surface(
@@ -219,17 +220,9 @@ private fun PartnerItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = partner.name,
+                text = partner.partnerEmail,
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp
-            )
-            
-            Spacer(modifier = Modifier.width(8.dp))
-            
-            Text(
-                text = partner.email,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
     }
