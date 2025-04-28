@@ -11,34 +11,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.spyapp.Person
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spyapp.R
 import com.example.spyapp.models.Invitation
+import com.example.spyapp.models.Person
+import com.example.spyapp.models.User
+import com.example.spyapp.viewmodels.AccountViewModel
 import com.example.spyapp.viewmodels.UserSession
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(
-    currentUser: Person = Person("Dawid Chudzicki", "dawid.chudz@gmail.com"),
-    partners: List<Person> = listOf(
-        Person("Bartosz Gotowski", "rei.okei@gmail.com")
-    ),
-    invitations: List<Invitation> = listOf(
-        Invitation(id = "1", fromEmail = "jan.kowalski@gmail.com", fromUserId = "user123", timestamp = System.currentTimeMillis()),
-        Invitation(id = "2", fromEmail = "anna.nowak@gmail.com", fromUserId = "user456", timestamp = System.currentTimeMillis())
-    ),
+    accountViewModel: AccountViewModel = viewModel(),
     onLogout: () -> Unit = {},
-    onAddPartner: () -> Unit = {},
-    onSelectPartner: (Person) -> Unit = {},
-    onAcceptInvitation: (Invitation) -> Unit = {},
-    onRejectInvitation: (Invitation) -> Unit = {},
     onNavigatePeople: () -> Unit = {},
     onNavigateJournal: () -> Unit = {},
     onNavigateAccount: () -> Unit = {}
 ) {
+    // Collect state from ViewModel
+    val currentUser by accountViewModel.currentUser.collectAsState()
+    val partners by accountViewModel.partners.collectAsState()
+    val invitations by accountViewModel.invitations.collectAsState()
+    
+    // Dialog state for adding partners
+    var showAddPartnerDialog by remember { mutableStateOf(false) }
+    var partnerEmail by remember { mutableStateOf("") }
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,35 +68,250 @@ fun AccountScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = currentUser.name,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            UserSession.email.value?.let {
+            // Display current user info
+            currentUser?.let { user ->
                 Text(
-                    text = it,
+                    text = user.displayName.ifEmpty { "User" },
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = user.email,
                     fontSize = 16.sp
                 )
+            } ?: run {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp))
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             PartnersSection(
                 partners = partners,
-                onAddPartner = onAddPartner,
-                onSelectPartner = onSelectPartner
+                onAddPartner = { showAddPartnerDialog = true },
+                onSelectPartner = { /* Handle partner selection if needed */ }
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             InvitationsSection(
                 invitations = invitations,
-                onAccept = onAcceptInvitation,
-                onReject = onRejectInvitation
+                onAccept = { invitation ->
+                    accountViewModel.acceptInvitation(invitation) { success, _ ->
+                        // Optional: Show feedback to user
+                    }
+                },
+                onReject = { invitation ->
+                    accountViewModel.rejectInvitation(invitation) { success, _ ->
+                        // Optional: Show feedback to user
+                    }
+                }
+            )
+        }
+    }
+    
+    // Dialog for adding a partner
+    if (showAddPartnerDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddPartnerDialog = false },
+            title = { Text("Add Partner") },
+            text = {
+                TextField(
+                    value = partnerEmail,
+                    onValueChange = { partnerEmail = it },
+                    label = { Text("Email") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        accountViewModel.addPartner(partnerEmail) { success, _ ->
+                            if (success) {
+                                partnerEmail = ""
+                                showAddPartnerDialog = false
+                            }
+                        }
+                    }
+                ) {
+                    Text("Add")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddPartnerDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun PartnersSection(
+    partners: List<Person>,
+    onAddPartner: () -> Unit,
+    onSelectPartner: (Person) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Partners",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Button(onClick = onAddPartner) {
+                Text("Add Partner")
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        if (partners.isEmpty()) {
+            Text(
+                text = "No partners yet",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 150.dp)
+            ) {
+                items(partners.size) { index ->
+                    val partner = partners[index]
+                    PartnerItem(
+                        partner = partner,
+                        onClick = { onSelectPartner(partner) }
+                    )
+                    
+                    if (index < partners.size - 1) {
+                        Divider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 0.5.dp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PartnerItem(
+    partner: Person,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = partner.name,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp
+            )
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            Text(
+                text = partner.email,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )
         }
     }
 }
+
+@Composable
+private fun InvitationsSection(
+    invitations: List<Invitation>,
+    onAccept: (Invitation) -> Unit,
+    onReject: (Invitation) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "Invitations",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        if (invitations.isEmpty()) {
+            Text(
+                text = "No pending invitations",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 200.dp)
+            ) {
+                items(invitations.size) { index ->
+                    val invitation = invitations[index]
+                    InvitationItem(
+                        invitation = invitation,
+                        onAccept = { onAccept(invitation) },
+                        onReject = { onReject(invitation) }
+                    )
+                    
+                    if (index < invitations.size - 1) {
+                        Divider(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            thickness = 0.5.dp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InvitationItem(
+    invitation: Invitation,
+    onAccept: () -> Unit,
+    onReject: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = invitation.fromEmail,
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp
+            )
+        }
+        
+        Row {
+            TextButton(onClick = onAccept) {
+                Text("Accept")
+            }
+            
+            TextButton(onClick = onReject) {
+                Text("Reject")
+            }
+        }
+    }
+}
+

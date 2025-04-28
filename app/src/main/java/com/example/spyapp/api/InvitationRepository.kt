@@ -15,8 +15,6 @@ class InvitationRepository {
     // W tym rozwiązaniu zaproszenie jest zapisywane w dokumentach nadawcy, a odbiorca pobiera je z kolekcji "invitations" w swoim dokumencie.
     suspend fun sendInvitation(toEmail: String) {
         val currentUser = auth.currentUser ?: throw Exception("User not authenticated")
-        // Dla uproszczenia zapisujemy zaproszenie w kolekcji "invitations" bieżącego użytkownika,
-        // ale w praktyce możesz zapisywać zaproszenie u nadawcy lub w centralnej kolekcji.
         val invitation = Invitation(
             fromUserId = currentUser.uid,
             fromEmail = currentUser.email ?: "",
@@ -30,7 +28,6 @@ class InvitationRepository {
             .await()
     }
 
-    // Pobieranie zaproszeń dla zalogowanego użytkownika (odbiorcy)
     fun getInvitations() = callbackFlow<List<Invitation>> {
         val currentUser = auth.currentUser ?: run {
             close(Exception("User not authenticated"))

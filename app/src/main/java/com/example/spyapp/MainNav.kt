@@ -38,10 +38,17 @@ import com.example.spyapp.screens.RecordingsScreen
 import com.example.spyapp.viewmodels.JournalViewModel
 import com.example.spyapp.viewmodels.PersonNoteViewModel
 import com.example.spyapp.viewmodels.PersonNoteViewModelFactory
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+
+    val isUserSignedIn = remember {
+        mutableStateOf(FirebaseAuth.getInstance().currentUser != null)
+    }
+    
+    val startDestination = if (isUserSignedIn.value) "people_list" else "login"
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -60,7 +67,7 @@ fun MainScreen() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "login",
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
 

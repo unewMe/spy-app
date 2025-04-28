@@ -21,7 +21,7 @@ class GalleryViewModel : ViewModel() {
         refreshGallery()
     }
 
-    fun refreshGallery() {
+    private fun refreshGallery() {
         viewModelScope.launch {
             try {
                 val userId = auth.currentUser?.uid ?: return@launch

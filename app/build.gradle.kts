@@ -41,7 +41,7 @@ android {
 }
 
 dependencies {
-
+    implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation ("com.google.dagger:hilt-android:2.44")
     implementation ("androidx.hilt:hilt-navigation-compose:1.1.0")

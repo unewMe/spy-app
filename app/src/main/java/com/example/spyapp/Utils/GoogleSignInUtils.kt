@@ -48,7 +48,8 @@ class GoogleSignInUtils {
                                 val user = Firebase.auth.signInWithCredential(authCredential).await().user
                                 user?.let {
                                     if(it.isAnonymous.not()){
-                                        it.email?.let { it1 -> UserSession.setEmail(it1) }
+                                        // Update the UserSession with the complete Firebase user object
+                                        UserSession.updateUserFromFirebase(it)
                                         login.invoke()
                                     }
                                 }
