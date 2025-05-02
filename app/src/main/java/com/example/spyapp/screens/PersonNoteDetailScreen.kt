@@ -9,16 +9,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.spyapp.models.PersonNote
+import com.example.spyapp.models.JournalNote
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonNoteDetailScreen(
-    note: PersonNote?,
+    note: JournalNote?,
     onBack: () -> Unit,
-    onEdit: (PersonNote) -> Unit
+    onEdit: (JournalNote) -> Unit
 ) {
     if (note == null) {
         // Jeśli notatka nie jest dostępna, wyświetl komunikat

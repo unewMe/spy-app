@@ -226,7 +226,7 @@ fun MainScreen() {
                 )
             }
 
-// Trasa dla dodawania notatki dla osoby
+            // Route for adding a note for a person - now using JournalNote instead of PersonNote
             composable("add_person_note/{personId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val personNoteViewModel: PersonNoteViewModel = viewModel(factory = PersonNoteViewModelFactory(personId))
@@ -239,8 +239,7 @@ fun MainScreen() {
                             if (success) {
                                 navController.popBackStack()
                             } else {
-                                // Możesz wyświetlić komunikat o błędzie np. za pomocą Toast lub Snackbar
-                                // Toast.makeText(context, error ?: "Error saving note", Toast.LENGTH_SHORT).show()
+                                // You can display an error message using Toast or Snackbar
                             }
                         }
                     },
@@ -248,12 +247,10 @@ fun MainScreen() {
                 )
             }
 
-// Trasa dla szczegółów notatki
+            // Route for note details - now working with JournalNote
             composable("person_note_detail/{personId}/{noteId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val noteId = backStackEntry.arguments?.getString("noteId") ?: ""
-                // Pobierz notatkę z PersonNoteViewModel – należy zastosować odpowiednią logikę
-                // Tutaj dla uproszczenia zakładamy, że masz już notatkę (możesz dodać podobną logikę jak w JournalDetailScreen)
                 val personNoteViewModel: PersonNoteViewModel = viewModel(factory = PersonNoteViewModelFactory(personId))
                 val note = personNoteViewModel.notes.collectAsState().value.find { it.id == noteId }
                 if (note != null) {
@@ -265,7 +262,7 @@ fun MainScreen() {
                 }
             }
 
-// Trasa dla edycji notatki dla osoby
+            // Route for editing a person note - now working with JournalNote
             composable("edit_person_note/{personId}/{noteId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val noteId = backStackEntry.arguments?.getString("noteId") ?: ""
@@ -273,7 +270,7 @@ fun MainScreen() {
                 val note = personNoteViewModel.notes.collectAsState().value.find { it.id == noteId }
                 if (note != null) {
                     PersonNoteFormScreen(
-                        personId = note.personId,
+                        personId = personId,
                         initialNote = note,
                         isEditMode = true,
                         onSave = { updatedNote ->

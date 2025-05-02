@@ -13,7 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.spyapp.models.PersonNote
+import com.example.spyapp.models.JournalNote
 import com.example.spyapp.viewmodels.PersonNoteViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spyapp.viewmodels.PersonNoteViewModelFactory
@@ -24,7 +24,7 @@ import java.util.*
 @Composable
 fun PersonNotesScreen(
     personId: String,
-    onNoteSelected: (PersonNote) -> Unit,
+    onNoteSelected: (JournalNote) -> Unit,
     onAddNote: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -80,7 +80,7 @@ fun PersonNotesScreen(
 }
 
 @Composable
-fun PersonNoteItem(note: PersonNote, dateFormat: SimpleDateFormat, onClick: () -> Unit) {
+fun PersonNoteItem(note: JournalNote, dateFormat: SimpleDateFormat, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

@@ -2,30 +2,35 @@ package com.example.spyapp.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.spyapp.api.PersonNoteRepository
-import com.example.spyapp.models.PersonNote
+import com.example.spyapp.api.JournalRepository
+import com.example.spyapp.models.JournalNote
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class PersonNoteViewModel(private val personId: String) : ViewModel() {
-    private val repository = PersonNoteRepository()
-    private val _notes = MutableStateFlow<List<PersonNote>>(emptyList())
-    val notes: StateFlow<List<PersonNote>> = _notes
+    private val repository = JournalRepository()
+    private val _notes = MutableStateFlow<List<JournalNote>>(emptyList())
+    val notes: StateFlow<List<JournalNote>> = _notes
 
     init {
         viewModelScope.launch {
-            repository.getPersonNotes(personId).collect { notes ->
+            repository.getJournalNotesForPerson(personId).collect { notes ->
                 _notes.value = notes.sortedByDescending { it.timestamp }
             }
         }
     }
 
-    fun addNote(note: PersonNote, onResult: (Boolean, String?) -> Unit) {
+    fun addNote(note: JournalNote, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
-                repository.addPersonNote(note)
+                // Make sure the personId is included in the personIds list
+                val noteWithPersonId = if (personId !in note.personIds) {
+                    note.copy(personIds = note.personIds + personId)
+                } else {
+                    note
+                }
+                repository.addJournalNote(noteWithPersonId)
                 onResult(true, null)
             } catch (e: Exception) {
                 onResult(false, e.message)
@@ -33,10 +38,16 @@ class PersonNoteViewModel(private val personId: String) : ViewModel() {
         }
     }
 
-    fun updateNote(note: PersonNote, onResult: (Boolean, String?) -> Unit) {
+    fun updateNote(note: JournalNote, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
-                repository.updatePersonNote(note)
+                // Make sure the personId is included in the personIds list
+                val noteWithPersonId = if (personId !in note.personIds) {
+                    note.copy(personIds = note.personIds + personId)
+                } else {
+                    note
+                }
+                repository.updateJournalNote(noteWithPersonId)
                 onResult(true, null)
             } catch (e: Exception) {
                 onResult(false, e.message)

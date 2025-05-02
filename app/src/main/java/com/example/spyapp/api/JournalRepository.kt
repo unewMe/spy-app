@@ -63,6 +63,57 @@ class JournalRepository {
         awaitClose { subscription.remove() }
     }
     
+    // New method for getting notes for a specific person
+    fun getJournalNotesForPerson(personId: String) = callbackFlow<List<JournalNote>> {
+        val userId = auth.currentUser?.uid ?: run {
+            close(Exception("User not authenticated"))
+            return@callbackFlow
+        }
+        
+        // Pobierz listę ID wszystkich partnerów
+        val partnerIds = try {
+            partnersRepository.getPartnerIds()
+        } catch (e: Exception) {
+            Log.e(TAG, "Error fetching partner IDs: ${e.message}")
+            emptyList<String>()
+        }
+        
+        // Utwórz listę wszystkich ID do których użytkownik ma dostęp (własne + partnerów)
+        val accessibleUserIds = listOf(userId) + partnerIds
+        
+        Log.d(TAG, "Fetching journal notes for person $personId from users: $accessibleUserIds")
+        
+        // Korzystamy z kolekcji głównej "journal" i filtrujemy po dostępnych userIds
+        val journalCollection = if (accessibleUserIds.size <= 10) {
+            firestore.collection(FirestoreCollections.JOURNAL)
+                .whereIn("userId", accessibleUserIds)
+                .whereArrayContains("personIds", personId)
+        } else {
+            // Firestore ma ograniczenie do 10 wartości w whereIn
+            // To uproszczone podejście, w rzeczywistej aplikacji można by użyć
+            // kilku zapytań lub innej strategii
+            firestore.collection(FirestoreCollections.JOURNAL)
+                .whereEqualTo("userId", userId)
+                .whereArrayContains("personIds", personId)
+        }
+            
+        val subscription = journalCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) { 
+                Log.e(TAG, "Error fetching journal notes for person: ${error.message}")
+                close(error)
+                return@addSnapshotListener 
+            }
+            if (snapshot != null) {
+                val notes = snapshot.toObjects(JournalNote::class.java).mapIndexed { index, note ->
+                    note.copy(id = snapshot.documents[index].id)
+                }
+                Log.d(TAG, "Fetched ${notes.size} journal notes for person $personId")
+                trySend(notes).isSuccess
+            }
+        }
+        awaitClose { subscription.remove() }
+    }
+    
     suspend fun addJournalNote(note: JournalNote) {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
         

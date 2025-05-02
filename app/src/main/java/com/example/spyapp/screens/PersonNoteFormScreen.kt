@@ -7,15 +7,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.spyapp.models.PersonNote
+import com.example.spyapp.models.JournalNote
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PersonNoteFormScreen(
     personId: String,
-    initialNote: PersonNote?,
+    initialNote: JournalNote?,
     isEditMode: Boolean,
-    onSave: (PersonNote) -> Unit,
+    onSave: (JournalNote) -> Unit,
     onClose: () -> Unit
 ) {
     var title by remember { mutableStateOf(initialNote?.title ?: "") }
@@ -32,12 +32,12 @@ fun PersonNoteFormScreen(
                 title = { Text(if (isEditMode) "Edit Note" else "Add Note") },
                 actions = {
                     TextButton(onClick = {
-                        val note = PersonNote(
+                        val note = JournalNote(
                             id = initialNote?.id ?: "",
-                            personId = personId,
                             title = title,
                             content = content,
-                            timestamp = System.currentTimeMillis()
+                            timestamp = System.currentTimeMillis(),
+                            personIds = initialNote?.personIds?.toList() ?: listOf(personId)
                         )
                         onSave(note)
                     }) {
