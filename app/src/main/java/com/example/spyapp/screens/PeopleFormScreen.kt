@@ -42,9 +42,10 @@ fun PersonFormScreen(
     initialPerson: Person?,
     isEditMode: Boolean,
     onSave: (Person) -> Unit, // callback wywoływany po zatwierdzeniu formularza
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    viewModel: PersonViewModel = viewModel() // Add optional viewModel parameter with default
 ) {
-    val personViewModel: PersonViewModel = viewModel()
+    // Now use the provided viewModel instead of creating a new one
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     
@@ -78,7 +79,7 @@ fun PersonFormScreen(
             // Upload the image if we're in edit mode and have a person ID
             if (isEditMode && initialPerson != null && initialPerson.id.isNotEmpty()) {
                 coroutineScope.launch {
-                    personViewModel.uploadAvatar(initialPerson.id, imageData) { success, url ->
+                    viewModel.uploadAvatar(initialPerson.id, imageData) { success, url ->
                         isAvatarUploading = false
                         if (success && url != null) {
                             photoUrl = url
@@ -113,7 +114,7 @@ fun PersonFormScreen(
                 // Upload the image if we're in edit mode and have a person ID
                 if (isEditMode && initialPerson != null && initialPerson.id.isNotEmpty()) {
                     coroutineScope.launch {
-                        personViewModel.uploadAvatar(initialPerson.id, imageData) { success, url ->
+                        viewModel.uploadAvatar(initialPerson.id, imageData) { success, url ->
                             isAvatarUploading = false
                             if (success && url != null) {
                                 photoUrl = url
