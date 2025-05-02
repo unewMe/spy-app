@@ -6,12 +6,29 @@ import com.example.spyapp.api.PersonRepository
 import com.example.spyapp.models.Person
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 class PersonViewModel : ViewModel() {
     private val repository = PersonRepository()
     private val _people = MutableStateFlow<List<Person>>(emptyList())
+    private val _searchQuery = MutableStateFlow("")
+    
+    // Filtered people based on search query
+    val filteredPeople = combine(_people, _searchQuery) { people, query ->
+        if (query.isBlank()) {
+            people
+        } else {
+            people.filter { person -> 
+                person.firstName.contains(query, ignoreCase = true) || 
+                person.lastName.contains(query, ignoreCase = true) ||
+                person.name.contains(query, ignoreCase = true) ||
+                person.email.contains(query, ignoreCase = true)
+            }
+        }
+    }
+    
+    // Keep original people list for reference
     val people: StateFlow<List<Person>> = _people
 
     init {
@@ -21,6 +38,14 @@ class PersonViewModel : ViewModel() {
             }
         }
     }
+    
+    // Update search query
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+    
+    // Get current search query
+    val searchQuery: StateFlow<String> = _searchQuery
 
     fun addPerson(person: Person, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {

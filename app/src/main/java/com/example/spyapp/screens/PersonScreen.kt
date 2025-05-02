@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -26,8 +27,8 @@ fun PersonScreen(
     onAddPerson: () -> Unit,
     viewModel: PersonViewModel = viewModel()
 ) {
-    val peopleState = viewModel.people.collectAsState()
-    val people = peopleState.value
+    val filteredPeople by viewModel.filteredPeople.collectAsState(initial = emptyList())
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -36,8 +37,8 @@ fun PersonScreen(
                 .padding(16.dp)
         ) {
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = searchQuery,
+                onValueChange = { viewModel.updateSearchQuery(it) },
                 placeholder = { Text("Search people") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 modifier = Modifier
@@ -71,16 +72,40 @@ fun PersonScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(people.size) { index ->
-                    PersonCard(person = people[index]) { person ->
-                        onPersonSelected(person)
+            if (filteredPeople.isEmpty() && searchQuery.isNotEmpty()) {
+                // Display no results message
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "No results found for \"$searchQuery\"",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        )
+                    }
+                }
+            } else {
+                // Display grid with filtered results
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(filteredPeople.size) { index ->
+                        PersonCard(person = filteredPeople[index]) { person ->
+                            onPersonSelected(person)
+                        }
                     }
                 }
             }

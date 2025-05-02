@@ -48,4 +48,33 @@ class GalleryViewModel : ViewModel() {
             Log.e("GalleryViewModel", "Error uploading image: ${e.message}")
         }
     }
+    
+    suspend fun deleteImage(imageUrl: String) {
+        try {
+            // Extract the file path from the download URL
+            // The URL format is typically: https://firebasestorage.googleapis.com/...
+            val userId = auth.currentUser?.uid ?: return
+            
+            // First find the reference by URL
+            val storageRefs = storage.reference
+                .child("users/$userId/gallery")
+                .listAll()
+                .await()
+                .items
+            
+            // Find the matching reference with the same download URL
+            for (ref in storageRefs) {
+                val downloadUrl = ref.downloadUrl.await().toString()
+                if (downloadUrl == imageUrl) {
+                    // Delete the file when found
+                    ref.delete().await()
+                    break
+                }
+            }
+            
+            refreshGallery() // Refresh gallery after deletion
+        } catch (e: Exception) {
+            Log.e("GalleryViewModel", "Error deleting image: ${e.message}")
+        }
+    }
 }
