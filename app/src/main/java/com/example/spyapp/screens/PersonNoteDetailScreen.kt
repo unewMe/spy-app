@@ -21,7 +21,7 @@ fun PersonNoteDetailScreen(
     onEdit: (JournalNote) -> Unit
 ) {
     if (note == null) {
-        // Jeśli notatka nie jest dostępna, wyświetl komunikat
+        
         Scaffold(
             topBar = {
                 TopAppBar(

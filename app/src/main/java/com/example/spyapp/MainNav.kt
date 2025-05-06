@@ -88,7 +88,7 @@ fun MainScreen() {
 
             composable("person_detail/{id}") { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id") ?: ""
-                // Wyszukujemy osobę po id z ViewModelu
+                
                 val personViewModel: PersonViewModel = viewModel()
                 val person = personViewModel.people.collectAsState().value.find { it.id == id }
                 if (person != null) {
@@ -127,7 +127,7 @@ fun MainScreen() {
                             if (success) {
                                 navController.popBackStack()
                             } else {
-                                // Możesz wyświetlić błąd np. Toast lub SnackBar
+                                
                             }
                         }
                     },
@@ -148,7 +148,7 @@ fun MainScreen() {
                                 if (success) {
                                     navController.popBackStack()
                                 } else {
-                                    // Obsłuż błąd
+                                    
                                 }
                             }
                         },
@@ -226,7 +226,7 @@ fun MainScreen() {
                 )
             }
 
-            // Route for adding a note for a person - now using JournalNote instead of PersonNote
+            
             composable("add_person_note/{personId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val personNoteViewModel: PersonNoteViewModel = viewModel(factory = PersonNoteViewModelFactory(personId))
@@ -239,7 +239,7 @@ fun MainScreen() {
                             if (success) {
                                 navController.popBackStack()
                             } else {
-                                // You can display an error message using Toast or Snackbar
+                                
                             }
                         }
                     },
@@ -247,7 +247,7 @@ fun MainScreen() {
                 )
             }
 
-            // Route for note details - now working with JournalNote
+            
             composable("person_note_detail/{personId}/{noteId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val noteId = backStackEntry.arguments?.getString("noteId") ?: ""
@@ -262,7 +262,7 @@ fun MainScreen() {
                 }
             }
 
-            // Route for editing a person note - now working with JournalNote
+            
             composable("edit_person_note/{personId}/{noteId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val noteId = backStackEntry.arguments?.getString("noteId") ?: ""

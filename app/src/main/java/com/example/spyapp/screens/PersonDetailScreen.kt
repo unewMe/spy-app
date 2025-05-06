@@ -51,7 +51,7 @@ fun PersonDetailScreen(person: Person, onBack: () -> Unit, onEdit: (Person) -> U
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Display avatar image if available, otherwise show a placeholder
+            
             if (person.photoUrl.isNotEmpty()) {
                 Image(
                     painter = rememberAsyncImagePainter(person.photoUrl),
@@ -80,7 +80,7 @@ fun PersonDetailScreen(person: Person, onBack: () -> Unit, onEdit: (Person) -> U
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.DateRange, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                // Format the birthdate properly
+                
                 val birthdateText = if (person.birthdate > 0) {
                     dateFormat.format(Date(person.birthdate))
                 } else {

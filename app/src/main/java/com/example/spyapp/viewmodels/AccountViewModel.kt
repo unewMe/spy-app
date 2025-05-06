@@ -38,7 +38,7 @@ class AccountViewModel : ViewModel() {
     }
     
     private fun loadCurrentUser() {
-        // Subscribe to the UserSession to get the current authenticated user
+        
         viewModelScope.launch {
             UserSession.currentUser.collectLatest { user ->
                 _currentUser.value = user

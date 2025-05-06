@@ -25,7 +25,7 @@ class JournalViewModel : ViewModel() {
     fun addNote(note: JournalNote, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
-                // Make sure we're not saving a note with empty personIds when it should have them
+                
                 if (note.personIds.isEmpty() && containsHashtags(note.content)) {
                     val personIds = extractPersonIdsFromContent(note.content)
                     val updatedNote = note.copy(personIds = personIds)
@@ -46,7 +46,7 @@ class JournalViewModel : ViewModel() {
     fun updateNote(note: JournalNote, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
-                // Make sure we're not saving a note with empty personIds when it should have them
+                
                 if (note.personIds.isEmpty() && containsHashtags(note.content)) {
                     val personIds = extractPersonIdsFromContent(note.content)
                     val updatedNote = note.copy(personIds = personIds)
@@ -64,19 +64,19 @@ class JournalViewModel : ViewModel() {
         }
     }
     
-    // Helper method to check if content contains hashtags
+    
     private fun containsHashtags(content: String): Boolean {
         return content.contains("#")
     }
     
-    // This is a fallback method to extract person IDs if they weren't properly set
-    // In a real app, you'd have a more robust way to map hashtags to person IDs
+    
+    
     private fun extractPersonIdsFromContent(content: String): List<String> {
-        // This is a temporary implementation that won't actually work
-        // since we can't reliably map hashtags to person IDs without additional context
-        // In a real app, we'd need to query the database to map names to IDs
         
-        // For now, just log that this should be implemented properly
+        
+        
+        
+        
         Log.w("JournalViewModel", "extractPersonIdsFromContent called, but can't correctly map hashtags to IDs")
         return emptyList()
     }

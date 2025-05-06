@@ -13,7 +13,7 @@ class PersonViewModel(private val repository: PersonRepository = PersonRepositor
     private val _people = MutableStateFlow<List<Person>>(emptyList())
     private val _searchQuery = MutableStateFlow("")
     
-    // Filtered people based on search query
+    
     val filteredPeople = combine(_people, _searchQuery) { people, query ->
         if (query.isBlank()) {
             people
@@ -27,7 +27,7 @@ class PersonViewModel(private val repository: PersonRepository = PersonRepositor
         }
     }
     
-    // Keep original people list for reference
+    
     val people: StateFlow<List<Person>> = _people
 
     init {
@@ -38,12 +38,12 @@ class PersonViewModel(private val repository: PersonRepository = PersonRepositor
         }
     }
     
-    // Update search query
+    
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
     
-    // Get current search query
+    
     val searchQuery: StateFlow<String> = _searchQuery
 
     fun addPerson(person: Person, onResult: (Boolean, String?) -> Unit) {
@@ -68,7 +68,7 @@ class PersonViewModel(private val repository: PersonRepository = PersonRepositor
         }
     }
     
-    // Upload avatar image for a person
+    
     fun uploadAvatar(personId: String, imageData: ByteArray, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {

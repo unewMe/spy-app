@@ -38,14 +38,14 @@ fun PersonCard(person: Person, onClick: (Person) -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            // Photo container that fills the whole width
+            
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
             ) {
                 if (person.photoUrl.isNotEmpty()) {
-                    // Display actual image when available
+                    
                     Image(
                         painter = rememberAsyncImagePainter(person.photoUrl),
                         contentDescription = "Avatar",
@@ -55,7 +55,7 @@ fun PersonCard(person: Person, onClick: (Person) -> Unit) {
                         contentScale = ContentScale.Crop
                     )
                 } else {
-                    // Display a square placeholder with gray color
+                    
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -65,7 +65,7 @@ fun PersonCard(person: Person, onClick: (Person) -> Unit) {
                 }
             }
             
-            // Text content below the image
+            
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

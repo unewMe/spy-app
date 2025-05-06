@@ -20,7 +20,7 @@ class PartnersRepository {
             return@callbackFlow
         }
         
-        // Pobieramy partnerów z kolekcji głównej filtrując po polu userId
+        
         val partnersRef = firestore.collection(FirestoreCollections.PARTNERS)
             .whereEqualTo("userId", userId)
             
@@ -39,7 +39,7 @@ class PartnersRepository {
         awaitClose { subscription.remove() }
     }
     
-    // New function to get a list of partner IDs
+    
     suspend fun getPartnerIds(): List<String> {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
         
@@ -51,7 +51,7 @@ class PartnersRepository {
         return snapshot.documents.mapNotNull { it.getString("partnerId") }
     }
     
-    // New helper function to get partner IDs as a Flow
+    
     fun getPartnerIdsFlow(): Flow<List<String>> = callbackFlow {
         val userId = auth.currentUser?.uid ?: run {
             close(Exception("User not authenticated"))
@@ -74,7 +74,7 @@ class PartnersRepository {
         awaitClose { subscription.remove() }
     }
     
-    // Helper function to get all accessible user IDs (current user and all partners)
+    
     suspend fun getAccessibleUserIds(): List<String> {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
         val partnerIds = getPartnerIds()

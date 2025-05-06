@@ -1,4 +1,4 @@
-// LoginScreen.kt
+
 package com.example.spyapp.screens
 
 import android.content.Intent
@@ -31,7 +31,7 @@ fun LoginScreen( onLoginSuccess: () -> Unit) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        // Optional: Handle result if needed
+        
     }
 
     Column(

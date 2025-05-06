@@ -1,7 +1,7 @@
 package com.example.spyapp.screens
 
 import android.content.ContentValues
-import android.graphics.Bitmap // Keep Bitmap for potential future use or other parts of the file
+import android.graphics.Bitmap 
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -37,9 +37,9 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.launch
-// Removed ByteArrayOutputStream as we are not compressing
+
 import java.io.InputStream
-// Removed File and FileOutputStream as we are not using temp files
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,20 +52,20 @@ fun GalleryScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // State for full-screen photo viewer
+    
     var showFullScreen by remember { mutableStateOf(false) }
     var selectedImageIndex by remember { mutableStateOf(0) }
     
-    // Create a URI for saving the full-resolution photo
+    
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     
-    // Separate states for uploads and deletions
+    
     var isUploading by remember { mutableStateOf(false) }
     var isDeleting by remember { mutableStateOf(false) }
     
-    // Removed the fixImageRotation function as it's no longer needed
     
-    // Create URI for the full-resolution photo
+    
+    
     fun createImageUri(): Uri? {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, "photo_${System.currentTimeMillis()}.jpg")
@@ -82,27 +82,27 @@ fun GalleryScreen(
         )
     }
     
-    // Full-resolution camera launcher (captures to URI)
+    
     val cameraFullResLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success: Boolean ->
         if (success && photoUri != null) {
             try {
-                // Get the InputStream directly from the URI
+                
                 val inputStream: InputStream? = context.contentResolver.openInputStream(photoUri!!)
                 inputStream?.use { stream ->
-                    // Read the raw bytes directly from the stream
+                    
                     val imageBytes = stream.readBytes()
                     
-                    // Set uploading state to true before starting the upload
+                    
                     isUploading = true
                     
-                    // Upload the raw image bytes without compression or rotation fix
+                    
                     coroutineScope.launch {
                         try {
                             galleryViewModel.uploadImage(imageBytes)
                         } finally {
-                            // Set uploading state to false when upload completes or fails
+                            
                             isUploading = false
                         }
                     }
@@ -173,7 +173,7 @@ fun GalleryScreen(
                 }
             }
             
-            // Show loading overlay when uploading
+            
             if (isUploading) {
                 Box(
                     modifier = Modifier
@@ -207,7 +207,7 @@ fun GalleryScreen(
                 }
             }
             
-            // Show loading overlay when deleting
+            
             if (isDeleting) {
                 Box(
                     modifier = Modifier
@@ -243,21 +243,21 @@ fun GalleryScreen(
         }
     }
 
-    // Full Screen Photo Viewer
+    
     if (showFullScreen && images.isNotEmpty()) {
         FullScreenPhotoViewer(
             images = images,
             initialPage = selectedImageIndex,
             onDismiss = { showFullScreen = false },
             onDelete = { imageUrl ->
-                // Set loading state to show feedback during deletion
+                
                 isDeleting = true
                 coroutineScope.launch {
                     try {
                         galleryViewModel.deleteImage(imageUrl)
                     } finally {
                         isDeleting = false
-                        // After deletion, close the full-screen viewer
+                        
                         showFullScreen = false
                     }
                 }
@@ -289,7 +289,7 @@ fun FullScreenPhotoViewer(
                 .fillMaxSize()
                 .systemBarsPadding()
         ) {
-            // Pager for swiping between images
+            
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
@@ -307,7 +307,7 @@ fun FullScreenPhotoViewer(
                 }
             }
             
-            // Top action buttons
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -315,7 +315,7 @@ fun FullScreenPhotoViewer(
                     .align(Alignment.TopEnd),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Delete button
+                
                 IconButton(
                     onClick = { showDeleteConfirmDialog = true }
                 ) {
@@ -328,7 +328,7 @@ fun FullScreenPhotoViewer(
                 
                 Spacer(modifier = Modifier.weight(1f))
                 
-                // Close button
+                
                 IconButton(onClick = onDismiss) {
                     Icon(
                         Icons.Default.Close,
@@ -338,7 +338,7 @@ fun FullScreenPhotoViewer(
                 }
             }
             
-            // Image counter
+            
             Text(
                 text = "${pagerState.currentPage + 1} / ${images.size}",
                 color = Color.White,
@@ -349,7 +349,7 @@ fun FullScreenPhotoViewer(
         }
     }
     
-    // Delete confirmation dialog
+    
     if (showDeleteConfirmDialog && images.isNotEmpty() && pagerState.currentPage < images.size) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmDialog = false },
@@ -361,7 +361,7 @@ fun FullScreenPhotoViewer(
                         onDelete(images[pagerState.currentPage])
                         showDeleteConfirmDialog = false
                         if (images.size <= 1) {
-                            onDismiss() // Close the viewer if this was the last image
+                            onDismiss() 
                         }
                     }
                 ) {

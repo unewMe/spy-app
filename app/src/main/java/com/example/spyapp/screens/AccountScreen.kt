@@ -32,12 +32,12 @@ fun AccountScreen(
     onNavigateJournal: () -> Unit = {},
     onNavigateAccount: () -> Unit = {}
 ) {
-    // Collect state from ViewModel
+    
     val currentUser by accountViewModel.currentUser.collectAsState()
     val partners by accountViewModel.partners.collectAsState()
     val invitations by accountViewModel.invitations.collectAsState()
     
-    // Dialog state for adding partners
+    
     var showAddPartnerDialog by remember { mutableStateOf(false) }
     var partnerEmail by remember { mutableStateOf("") }
     
@@ -69,7 +69,7 @@ fun AccountScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Display current user info
+            
             currentUser?.let { user ->
                 Text(
                     text = user.displayName.ifEmpty { "User" },
@@ -100,19 +100,19 @@ fun AccountScreen(
                 invitations = invitations,
                 onAccept = { invitation ->
                     accountViewModel.acceptInvitation(invitation) { success, _ ->
-                        // Optional: Show feedback to user
+                        
                     }
                 },
                 onReject = { invitation ->
                     accountViewModel.rejectInvitation(invitation) { success, _ ->
-                        // Optional: Show feedback to user
+                        
                     }
                 }
             )
         }
     }
     
-    // Dialog for adding a partner
+    
     if (showAddPartnerDialog) {
         AlertDialog(
             onDismissRequest = { showAddPartnerDialog = false },

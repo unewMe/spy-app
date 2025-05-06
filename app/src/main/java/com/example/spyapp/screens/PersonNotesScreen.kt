@@ -28,7 +28,7 @@ fun PersonNotesScreen(
     onAddNote: () -> Unit,
     onBack: () -> Unit
 ) {
-    // Uzyskujemy ViewModel z parametrem personId – tu zakładamy, że mamy fabrykę
+    
     val personNoteViewModel: PersonNoteViewModel = viewModel(factory = PersonNoteViewModelFactory(personId))
     val notes by personNoteViewModel.notes.collectAsState()
     var searchQuery by remember { mutableStateOf("") }

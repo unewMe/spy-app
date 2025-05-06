@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -36,7 +37,6 @@ fun RecordingsScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Launcher do nagrywania audio przy pomocy wbudowanego dyktafonu
     val audioLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -60,13 +60,7 @@ fun RecordingsScreen(
         }
     }
 
-    // Intent, który uruchamia aplikację do nagrywania dźwięku
     val recordIntent = Intent(android.provider.MediaStore.Audio.Media.RECORD_SOUND_ACTION)
-    if (recordIntent.resolveActivity(context.packageManager) != null) {
-        audioLauncher.launch(recordIntent)
-    } else {
-        Toast.makeText(context, "No audio recording app available", Toast.LENGTH_SHORT).show()
-    }
 
     Scaffold(
         topBar = {
@@ -80,7 +74,13 @@ fun RecordingsScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { audioLauncher.launch(recordIntent) }) {
+            FloatingActionButton(onClick = {
+                if (recordIntent.resolveActivity(context.packageManager) != null) {
+                    audioLauncher.launch(recordIntent)
+                } else {
+                    Toast.makeText(context, "No audio recording app available", Toast.LENGTH_SHORT).show()
+                }
+            }) {
                 Icon(Icons.Filled.Mic, contentDescription = "Record Audio")
             }
         }
@@ -102,19 +102,25 @@ fun RecordingsScreen(
                 contentPadding = PaddingValues(8.dp)
             ) {
                 items(recordings) { recordingUrl ->
-                    Text(
-                        text = recordingUrl,
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp)
                             .clickable {
-                                // Otwórz nagranie przy pomocy odtwarzacza audio
+                                
                                 val playIntent = Intent(Intent.ACTION_VIEW).apply {
                                     setDataAndType(Uri.parse(recordingUrl), "audio/*")
                                 }
                                 context.startActivity(playIntent)
-                            }
-                    )
+                            },
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically 
+                    ) {
+                        Icon(Icons.Filled.PlayArrow, contentDescription = "Play Recording") 
+                        Spacer(modifier = Modifier.width(8.dp)) 
+                        Text(
+                            text = "Recording - ${recordings.indexOf(recordingUrl) + 1}",
+                        )
+                    }
                 }
             }
         }

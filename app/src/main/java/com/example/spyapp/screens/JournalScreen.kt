@@ -41,7 +41,7 @@ fun JournalScreen(
         matchesQuery && matchesPerson
     }
     if (showPersonDialog) {
-        // Wywołujemy dialog z opcją "All" dla filtrowania
+        
         PersonSelectionDialog(
             onDismiss = { showPersonDialog = false },
             onPersonSelected = { person ->

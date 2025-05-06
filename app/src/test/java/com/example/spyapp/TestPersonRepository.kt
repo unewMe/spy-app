@@ -11,18 +11,18 @@ import kotlinx.coroutines.flow.flowOf
  */
 class TestPersonRepository : PersonRepository() {
     
-    // Tracking calls for verification
+    
     var updatePersonCalled = false
     var addPersonCalled = false
     
-    // Track the most recently used person in operations
+    
     var lastUpdatedPerson: Person? = null
     var lastAddedPerson: Person? = null
     
-    // Override persons list for testing
+    
     private val personsFlow = MutableStateFlow<List<Person>>(emptyList())
     
-    // Success flags to control callback behavior
+    
     var shouldSucceed = true
     var errorMessage = "Test error"
     
@@ -38,7 +38,7 @@ class TestPersonRepository : PersonRepository() {
             throw Exception(errorMessage)
         }
         
-        // Update the person in the list if we want to simulate a real repository
+        
         val currentList = personsFlow.value
         val updatedList = currentList.map { 
             if (it.id == person.id) person else it 
@@ -54,9 +54,9 @@ class TestPersonRepository : PersonRepository() {
             throw Exception(errorMessage)
         }
         
-        // Add the person to our simulated list
+        
         val currentList = personsFlow.value.toMutableList()
-        // In a real repository, this would generate an ID
+        
         val personWithId = if (person.id.isEmpty()) {
             person.copy(id = "generated-test-id")
         } else {
@@ -66,7 +66,7 @@ class TestPersonRepository : PersonRepository() {
         personsFlow.value = currentList
     }
     
-    // Reset state between tests
+    
     fun reset() {
         updatePersonCalled = false
         addPersonCalled = false

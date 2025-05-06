@@ -73,7 +73,7 @@ fun PersonScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             if (filteredPeople.isEmpty() && searchQuery.isNotEmpty()) {
-                // Display no results message
+                
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -94,7 +94,7 @@ fun PersonScreen(
                     }
                 }
             } else {
-                // Display grid with filtered results
+                
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier.fillMaxSize(),
@@ -111,7 +111,7 @@ fun PersonScreen(
             }
         }
 
-        // FloatingActionButton w prawym dolnym rogu
+        
         FloatingActionButton(
             onClick = onAddPerson,
             modifier = Modifier

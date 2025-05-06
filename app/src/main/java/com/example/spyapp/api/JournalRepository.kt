@@ -21,7 +21,7 @@ class JournalRepository {
             return@callbackFlow
         }
         
-        // Pobierz listę ID wszystkich partnerów
+        
         val partnerIds = try {
             partnersRepository.getPartnerIds()
         } catch (e: Exception) {
@@ -29,19 +29,19 @@ class JournalRepository {
             emptyList<String>()
         }
         
-        // Utwórz listę wszystkich ID do których użytkownik ma dostęp (własne + partnerów)
+        
         val accessibleUserIds = listOf(userId) + partnerIds
         
         Log.d(TAG, "Fetching journal notes from users: $accessibleUserIds")
         
-        // Korzystamy z kolekcji głównej "journal" i filtrujemy po dostępnych userIds
+        
         val journalCollection = if (accessibleUserIds.size <= 10) {
             firestore.collection(FirestoreCollections.JOURNAL)
                 .whereIn("userId", accessibleUserIds)
         } else {
-            // Firestore ma ograniczenie do 10 wartości w whereIn
-            // To uproszczone podejście, w rzeczywistej aplikacji można by użyć
-            // kilku zapytań lub innej strategii
+            
+            
+            
             firestore.collection(FirestoreCollections.JOURNAL)
                 .whereEqualTo("userId", userId)
         }
@@ -63,14 +63,14 @@ class JournalRepository {
         awaitClose { subscription.remove() }
     }
     
-    // New method for getting notes for a specific person
+    
     fun getJournalNotesForPerson(personId: String) = callbackFlow<List<JournalNote>> {
         val userId = auth.currentUser?.uid ?: run {
             close(Exception("User not authenticated"))
             return@callbackFlow
         }
         
-        // Pobierz listę ID wszystkich partnerów
+        
         val partnerIds = try {
             partnersRepository.getPartnerIds()
         } catch (e: Exception) {
@@ -78,20 +78,20 @@ class JournalRepository {
             emptyList<String>()
         }
         
-        // Utwórz listę wszystkich ID do których użytkownik ma dostęp (własne + partnerów)
+        
         val accessibleUserIds = listOf(userId) + partnerIds
         
         Log.d(TAG, "Fetching journal notes for person $personId from users: $accessibleUserIds")
         
-        // Korzystamy z kolekcji głównej "journal" i filtrujemy po dostępnych userIds
+        
         val journalCollection = if (accessibleUserIds.size <= 10) {
             firestore.collection(FirestoreCollections.JOURNAL)
                 .whereIn("userId", accessibleUserIds)
                 .whereArrayContains("personIds", personId)
         } else {
-            // Firestore ma ograniczenie do 10 wartości w whereIn
-            // To uproszczone podejście, w rzeczywistej aplikacji można by użyć
-            // kilku zapytań lub innej strategii
+            
+            
+            
             firestore.collection(FirestoreCollections.JOURNAL)
                 .whereEqualTo("userId", userId)
                 .whereArrayContains("personIds", personId)
@@ -117,7 +117,7 @@ class JournalRepository {
     suspend fun addJournalNote(note: JournalNote) {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
         
-        // Dodajemy pole userId do notatki przed zapisaniem
+        
         val noteWithUserId = note.copy(userId = userId)
         
         try {
@@ -135,14 +135,14 @@ class JournalRepository {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
         if (note.id.isEmpty()) throw Exception("Note id is empty")
         
-        // Pobieramy aktualną notatkę, aby nie zmienić właściciela
+        
         val existingNote = firestore.collection(FirestoreCollections.JOURNAL)
             .document(note.id)
             .get()
             .await()
             .toObject(JournalNote::class.java) ?: throw Exception("Journal note not found")
             
-        // Upewniamy się, że pole userId pozostaje niezmienione
+        
         val noteWithCorrectUserId = note.copy(userId = existingNote.userId)
         
         try {
