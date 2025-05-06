@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 
-class PersonRepository {
+open class PersonRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -21,7 +21,7 @@ class PersonRepository {
     private val TAG = "PersonRepository"
 
     // Pobieranie listy osób własnych i należących do partnerów
-    fun getPersons() = callbackFlow<List<Person>> {
+    open fun getPersons() = callbackFlow<List<Person>> {
         val userId = auth.currentUser?.uid
         if (userId == null) {
             Log.e(TAG, "User not authenticated")
@@ -75,7 +75,7 @@ class PersonRepository {
     }
 
     // Funkcja dodająca osobę do głównej kolekcji "persons" z polem userId
-    suspend fun addPerson(person: Person) {
+    open suspend fun addPerson(person: Person) {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
         
         // Dodajemy pole userId do obiektu Person przed zapisaniem
@@ -93,7 +93,7 @@ class PersonRepository {
     }
 
     // Funkcja aktualizująca osobę – wymaga, by person.id było ustawione
-    suspend fun updatePerson(person: Person) {
+    open suspend fun updatePerson(person: Person) {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
         if (person.id.isEmpty()) {
             throw Exception("Person id is empty, cannot update")

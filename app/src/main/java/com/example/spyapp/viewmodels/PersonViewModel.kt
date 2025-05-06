@@ -9,8 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-class PersonViewModel : ViewModel() {
-    private val repository = PersonRepository()
+class PersonViewModel(private val repository: PersonRepository = PersonRepository()) : ViewModel() {
     private val _people = MutableStateFlow<List<Person>>(emptyList())
     private val _searchQuery = MutableStateFlow("")
     
