@@ -1,4 +1,4 @@
-package com.example.spyapp.Utils
+package com.example.spyapp.utils
 
 import android.content.Context
 import android.content.Intent

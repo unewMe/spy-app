@@ -20,7 +20,7 @@ open class PersonRepository {
     private val partnersRepository = PartnersRepository()
     private val TAG = "PersonRepository"
 
-    
+    // Pobieranie listy osób własnych i należących do partnerów
     open fun getPersons() = callbackFlow<List<Person>> {
         val userId = auth.currentUser?.uid
         if (userId == null) {

@@ -1,6 +1,5 @@
 package com.example.spyapp.navigation
 
-import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -19,7 +18,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.spyapp.models.Person
 import com.example.spyapp.R
-import com.example.spyapp.Utils.GoogleSignOutUtils
+import com.example.spyapp.utils.GoogleSignOutUtils
 import com.example.spyapp.screens.AccountScreen
 import com.example.spyapp.screens.LoginScreen
 import com.example.spyapp.screens.PersonScreen

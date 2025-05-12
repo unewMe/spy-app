@@ -4,12 +4,22 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.spyapp.models.Person
 import com.example.spyapp.screens.PersonFormScreen
+import com.example.spyapp.viewmodels.PersonViewModel
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.*
+import org.mockito.kotlin.mock
 
 class PeopleFormScreenTest {
+    private lateinit var mockViewModel: PersonViewModel
+
+    @Before
+    fun setup() {
+        mockViewModel = mock<PersonViewModel>()
+    }
+
     @get:Rule
     val composeTestRule = createComposeRule()
     
@@ -32,7 +42,8 @@ class PeopleFormScreenTest {
                 initialPerson = testPerson,
                 isEditMode = true,
                 onSave = {},
-                onClose = {}
+                onClose = {},
+                viewModel = mockViewModel
             )
         }
         
@@ -52,7 +63,8 @@ class PeopleFormScreenTest {
                 initialPerson = null,
                 isEditMode = false,
                 onSave = {},
-                onClose = {}
+                onClose = {},
+                viewModel = mockViewModel
             )
         }
         
@@ -76,7 +88,8 @@ class PeopleFormScreenTest {
                 initialPerson = testPerson,
                 isEditMode = true,
                 onSave = {},
-                onClose = {}
+                onClose = {},
+                viewModel = mockViewModel
             )
         }
         
@@ -89,6 +102,8 @@ class PeopleFormScreenTest {
         
         var savedPerson: Person? = null
         
+
+        
         composeTestRule.setContent {
             PersonFormScreen(
                 initialPerson = null,
@@ -96,7 +111,8 @@ class PeopleFormScreenTest {
                 onSave = { person ->
                     savedPerson = person
                 },
-                onClose = {}
+                onClose = {},
+                viewModel = mockViewModel
             )
         }
         
@@ -125,12 +141,15 @@ class PeopleFormScreenTest {
         
         var closeCalled = false
         
+
+        
         composeTestRule.setContent {
             PersonFormScreen(
                 initialPerson = null,
                 isEditMode = false,
                 onSave = {},
-                onClose = { closeCalled = true }
+                onClose = { closeCalled = true },
+                viewModel = mockViewModel
             )
         }
         

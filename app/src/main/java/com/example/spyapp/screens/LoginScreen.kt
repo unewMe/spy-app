@@ -18,9 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.spyapp.R
-import com.example.spyapp.Utils.GoogleSignInUtils
+import com.example.spyapp.utils.GoogleSignInUtils
 import kotlinx.coroutines.CoroutineScope
-import androidx.hilt.navigation.compose.hiltViewModel
 
 
 @Composable
