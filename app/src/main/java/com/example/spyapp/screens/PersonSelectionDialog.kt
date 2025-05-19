@@ -21,9 +21,9 @@ import androidx.compose.runtime.getValue
 fun PersonSelectionDialog(
     onDismiss: () -> Unit,
     onPersonSelected: (Person?) -> Unit,
-    showAllOption: Boolean = false
+    showAllOption: Boolean = false,
+    personViewModel: PersonViewModel = viewModel()
 ) {
-    val personViewModel: PersonViewModel = viewModel()
     val persons by personViewModel.people.collectAsState()
     AlertDialog(
         onDismissRequest = onDismiss,

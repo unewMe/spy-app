@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spyapp.models.JournalNote
-import com.example.spyapp.models.Person
 import com.example.spyapp.viewmodels.PersonViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,7 +20,8 @@ fun JournalFormScreen(
     initialNote: JournalNote?,
     isEditMode: Boolean,
     onSave: (JournalNote) -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    personViewModel: PersonViewModel = viewModel()
 ) {
     var title by remember { mutableStateOf(initialNote?.title ?: "") }
     var content by remember { mutableStateOf(initialNote?.content ?: "") }
@@ -29,13 +29,12 @@ fun JournalFormScreen(
     
     
     var inHashtagMode by remember { mutableStateOf(false) }
-    var hashtagStartIndex by remember { mutableStateOf(-1) }
+    var hashtagStartIndex by remember { mutableIntStateOf(-1) }
     
     
     var completedHashtags by remember { mutableStateOf(mutableMapOf<Int, String>()) }
     
     
-    val personViewModel: PersonViewModel = viewModel()
     val allPeople by personViewModel.people.collectAsState()
     
     
@@ -271,7 +270,8 @@ fun JournalFormScreen(
                 inHashtagMode = false
                 hashtagStartIndex = -1
             },
-            showAllOption = false
+            showAllOption = false,
+            personViewModel = personViewModel
         )
     }
 }

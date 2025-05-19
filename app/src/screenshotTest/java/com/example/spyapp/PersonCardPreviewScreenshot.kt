@@ -5,10 +5,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.spyapp.components.PersonCard
 import com.example.spyapp.models.Person
 
-class ExamplePreviewsScreenshots {
+class PersonCardPreviewScreenshot {
     @Preview(showBackground = true)
     @Composable
-    fun GreetingPreview() {
+    fun PersonCardPreview() {
         PersonCard(
             person = Person(
                 firstName = "John",
