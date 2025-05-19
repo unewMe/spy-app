@@ -24,7 +24,7 @@ class PersonNoteViewModel(private val personId: String) : ViewModel() {
     fun addNote(note: JournalNote, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
-                
+
                 val noteWithPersonId = if (personId !in note.personIds) {
                     note.copy(personIds = note.personIds + personId)
                 } else {
@@ -41,7 +41,7 @@ class PersonNoteViewModel(private val personId: String) : ViewModel() {
     fun updateNote(note: JournalNote, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
-                
+
                 val noteWithPersonId = if (personId !in note.personIds) {
                     note.copy(personIds = note.personIds + personId)
                 } else {

@@ -10,8 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.spyapp.navigation.MainScreen
-import com.example.spyapp.screens.PersonScreen
 import com.example.spyapp.ui.theme.SpyAppTheme
 
 class MainActivity : ComponentActivity() {

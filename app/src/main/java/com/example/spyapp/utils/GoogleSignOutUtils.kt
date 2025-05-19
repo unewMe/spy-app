@@ -8,6 +8,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.exceptions.ClearCredentialException
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 class GoogleSignOutUtils {
 
     companion object {
+        @OptIn(DelicateCoroutinesApi::class)
         fun doGoogleSignOut(context: Context, logout: () -> Unit) {
 
 

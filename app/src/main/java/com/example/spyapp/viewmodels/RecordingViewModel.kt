@@ -25,8 +25,9 @@ class RecordingsViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val userId = auth.currentUser?.uid ?: return@launch
-                
-                val listResult = storage.reference.child("users/$userId/recordings").listAll().await()
+
+                val listResult =
+                    storage.reference.child("users/$userId/recordings").listAll().await()
                 val downloadUrls = listResult.items.map { ref ->
                     ref.downloadUrl.await().toString()
                 }
@@ -43,7 +44,7 @@ class RecordingsViewModel : ViewModel() {
             val filename = "${System.currentTimeMillis()}.3gp"
             val ref = storage.reference.child("users/$userId/recordings/$filename")
             ref.putBytes(data).await()
-            refreshRecordings() 
+            refreshRecordings()
         } catch (e: Exception) {
             Log.e("RecordingsViewModel", "Error uploading recording: ${e.message}")
         }

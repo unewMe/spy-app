@@ -25,7 +25,7 @@ class GalleryViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val userId = auth.currentUser?.uid ?: return@launch
-                
+
                 val listResult = storage.reference.child("users/$userId/gallery").listAll().await()
                 val downloadUrls = listResult.items.map { ref ->
                     ref.downloadUrl.await().toString()
@@ -43,36 +43,36 @@ class GalleryViewModel : ViewModel() {
             val filename = "${System.currentTimeMillis()}.jpg"
             val ref = storage.reference.child("users/$userId/gallery/$filename")
             ref.putBytes(data).await()
-            refreshGallery() 
+            refreshGallery()
         } catch (e: Exception) {
             Log.e("GalleryViewModel", "Error uploading image: ${e.message}")
         }
     }
-    
+
     suspend fun deleteImage(imageUrl: String) {
         try {
-            
-            
+
+
             val userId = auth.currentUser?.uid ?: return
-            
-            
+
+
             val storageRefs = storage.reference
                 .child("users/$userId/gallery")
                 .listAll()
                 .await()
                 .items
-            
-            
+
+
             for (ref in storageRefs) {
                 val downloadUrl = ref.downloadUrl.await().toString()
                 if (downloadUrl == imageUrl) {
-                    
+
                     ref.delete().await()
                     break
                 }
             }
-            
-            refreshGallery() 
+
+            refreshGallery()
         } catch (e: Exception) {
             Log.e("GalleryViewModel", "Error deleting image: ${e.message}")
         }

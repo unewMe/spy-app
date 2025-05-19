@@ -1,16 +1,19 @@
 package com.example.spyapp
 
-import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.example.spyapp.models.Person
 import com.example.spyapp.screens.PersonFormScreen
 import com.example.spyapp.viewmodels.PersonViewModel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.text.SimpleDateFormat
-import java.util.*
 import org.mockito.kotlin.mock
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PeopleFormScreenTest {
     private lateinit var mockViewModel: PersonViewModel

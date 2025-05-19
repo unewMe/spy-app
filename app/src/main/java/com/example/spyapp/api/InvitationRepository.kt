@@ -12,8 +12,7 @@ class InvitationRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    
-    
+
     suspend fun sendInvitation(toEmail: String) {
         val currentUser = auth.currentUser ?: throw Exception("User not authenticated")
         val invitation = Invitation(
@@ -22,8 +21,8 @@ class InvitationRepository {
             toEmail = toEmail,
             timestamp = System.currentTimeMillis()
         )
-        
-        
+
+
         firestore.collection(FirestoreCollections.INVITATIONS)
             .add(invitation)
             .await()
@@ -34,11 +33,11 @@ class InvitationRepository {
             close(Exception("User not authenticated"))
             return@callbackFlow
         }
-        
-        
+
+
         val invitationsRef = firestore.collection(FirestoreCollections.INVITATIONS)
             .whereEqualTo("toEmail", currentUser.email)
-            
+
         val subscription = invitationsRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 close(error)
@@ -55,39 +54,43 @@ class InvitationRepository {
         awaitClose { subscription.remove() }
     }
 
-    
+
     suspend fun acceptInvitation(invitation: Invitation) {
         val currentUser = auth.currentUser ?: throw Exception("User not authenticated")
-        
-        
+
+
         firestore.collection(FirestoreCollections.PARTNERS)
-            .add(mapOf(
-                "userId" to currentUser.uid,
-                "partnerId" to invitation.fromUserId,
-                "partnerEmail" to invitation.fromEmail
-            ))
+            .add(
+                mapOf(
+                    "userId" to currentUser.uid,
+                    "partnerId" to invitation.fromUserId,
+                    "partnerEmail" to invitation.fromEmail
+                )
+            )
             .await()
-            
-        
+
+
         val currentEmail = currentUser.email ?: ""
         firestore.collection(FirestoreCollections.PARTNERS)
-            .add(mapOf(
-                "userId" to invitation.fromUserId,
-                "partnerId" to currentUser.uid,
-                "partnerEmail" to currentEmail
-            ))
+            .add(
+                mapOf(
+                    "userId" to invitation.fromUserId,
+                    "partnerId" to currentUser.uid,
+                    "partnerEmail" to currentEmail
+                )
+            )
             .await()
-            
-        
+
+
         firestore.collection(FirestoreCollections.INVITATIONS)
             .document(invitation.id)
             .delete()
             .await()
     }
 
-    
+
     suspend fun rejectInvitation(invitation: Invitation) {
-        val currentUser = auth.currentUser ?: throw Exception("User not authenticated")
+        auth.currentUser ?: throw Exception("User not authenticated")
         firestore.collection(FirestoreCollections.INVITATIONS)
             .document(invitation.id)
             .delete()

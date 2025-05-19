@@ -1,42 +1,50 @@
-package com.example.spyapp.navigation
+package com.example.spyapp
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.spyapp.models.Person
-import com.example.spyapp.R
-import com.example.spyapp.utils.GoogleSignOutUtils
 import com.example.spyapp.screens.AccountScreen
-import com.example.spyapp.screens.LoginScreen
-import com.example.spyapp.screens.PersonScreen
-import com.example.spyapp.screens.PersonDetailScreen
-import com.example.spyapp.screens.PersonFormScreen
-import com.example.spyapp.viewmodels.PersonViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spyapp.screens.GalleryScreen
 import com.example.spyapp.screens.JournalDetailScreen
 import com.example.spyapp.screens.JournalFormScreen
 import com.example.spyapp.screens.JournalScreen
+import com.example.spyapp.screens.LoginScreen
+import com.example.spyapp.screens.PersonDetailScreen
+import com.example.spyapp.screens.PersonFormScreen
 import com.example.spyapp.screens.PersonNoteDetailScreen
 import com.example.spyapp.screens.PersonNoteFormScreen
 import com.example.spyapp.screens.PersonNotesScreen
+import com.example.spyapp.screens.PersonScreen
 import com.example.spyapp.screens.RecordingsScreen
+import com.example.spyapp.utils.GoogleSignOutUtils
 import com.example.spyapp.viewmodels.JournalViewModel
 import com.example.spyapp.viewmodels.PersonNoteViewModel
 import com.example.spyapp.viewmodels.PersonNoteViewModelFactory
+import com.example.spyapp.viewmodels.PersonViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -46,7 +54,7 @@ fun MainScreen() {
     val isUserSignedIn = remember {
         mutableStateOf(FirebaseAuth.getInstance().currentUser != null)
     }
-    
+
     val startDestination = if (isUserSignedIn.value) "people_list" else "login"
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -87,7 +95,7 @@ fun MainScreen() {
 
             composable("person_detail/{id}") { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id") ?: ""
-                
+
                 val personViewModel: PersonViewModel = viewModel()
                 val person = personViewModel.people.collectAsState().value.find { it.id == id }
                 if (person != null) {
@@ -107,13 +115,12 @@ fun MainScreen() {
 
             composable("recordings") {
                 RecordingsScreen(
-                    navController = navController,
                     onBack = { navController.popBackStack() }
                 )
             }
 
             composable("gallery") {
-                GalleryScreen(navController = navController, onBack = { navController.popBackStack() })
+                GalleryScreen(onBack = { navController.popBackStack() })
             }
 
             composable("add_person") {
@@ -125,8 +132,6 @@ fun MainScreen() {
                         personViewModel.addPerson(newPerson) { success, error ->
                             if (success) {
                                 navController.popBackStack()
-                            } else {
-                                
                             }
                         }
                     },
@@ -146,8 +151,6 @@ fun MainScreen() {
                             personViewModel.updatePerson(updatedPerson) { success, error ->
                                 if (success) {
                                     navController.popBackStack()
-                                } else {
-                                    
                                 }
                             }
                         },
@@ -187,7 +190,9 @@ fun MainScreen() {
                     isEditMode = false,
                     onSave = { newNote ->
                         journalViewModel.addNote(newNote) { success, error ->
-                            if (success) { navController.popBackStack() }
+                            if (success) {
+                                navController.popBackStack()
+                            }
                         }
                     },
                     onClose = { navController.popBackStack() }
@@ -204,7 +209,9 @@ fun MainScreen() {
                         isEditMode = true,
                         onSave = { updatedNote ->
                             journalViewModel.updateNote(updatedNote) { success, error ->
-                                if (success) { navController.popBackStack() }
+                                if (success) {
+                                    navController.popBackStack()
+                                }
                             }
                         },
                         onClose = { navController.popBackStack() }
@@ -225,10 +232,11 @@ fun MainScreen() {
                 )
             }
 
-            
+
             composable("add_person_note/{personId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
-                val personNoteViewModel: PersonNoteViewModel = viewModel(factory = PersonNoteViewModelFactory(personId))
+                val personNoteViewModel: PersonNoteViewModel =
+                    viewModel(factory = PersonNoteViewModelFactory(personId))
                 PersonNoteFormScreen(
                     personId = personId,
                     initialNote = null,
@@ -237,8 +245,6 @@ fun MainScreen() {
                         personNoteViewModel.addNote(note) { success, error ->
                             if (success) {
                                 navController.popBackStack()
-                            } else {
-                                
                             }
                         }
                     },
@@ -246,11 +252,12 @@ fun MainScreen() {
                 )
             }
 
-            
+
             composable("person_note_detail/{personId}/{noteId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val noteId = backStackEntry.arguments?.getString("noteId") ?: ""
-                val personNoteViewModel: PersonNoteViewModel = viewModel(factory = PersonNoteViewModelFactory(personId))
+                val personNoteViewModel: PersonNoteViewModel =
+                    viewModel(factory = PersonNoteViewModelFactory(personId))
                 val note = personNoteViewModel.notes.collectAsState().value.find { it.id == noteId }
                 if (note != null) {
                     PersonNoteDetailScreen(
@@ -261,11 +268,12 @@ fun MainScreen() {
                 }
             }
 
-            
+
             composable("edit_person_note/{personId}/{noteId}") { backStackEntry ->
                 val personId = backStackEntry.arguments?.getString("personId") ?: ""
                 val noteId = backStackEntry.arguments?.getString("noteId") ?: ""
-                val personNoteViewModel: PersonNoteViewModel = viewModel(factory = PersonNoteViewModelFactory(personId))
+                val personNoteViewModel: PersonNoteViewModel =
+                    viewModel(factory = PersonNoteViewModelFactory(personId))
                 val note = personNoteViewModel.notes.collectAsState().value.find { it.id == noteId }
                 if (note != null) {
                     PersonNoteFormScreen(
@@ -285,7 +293,9 @@ fun MainScreen() {
             composable("account") {
                 val context = LocalContext.current
                 AccountScreen(onLogout = {
-                    GoogleSignOutUtils.doGoogleSignOut(context, logout = { navController.navigateSingleTop("login") })
+                    GoogleSignOutUtils.doGoogleSignOut(
+                        context,
+                        logout = { navController.navigateSingleTop("login") })
                 })
             }
         }
@@ -306,13 +316,25 @@ fun BottomBar(
                     || currentRoute?.startsWith("add_person") == true
                     || currentRoute?.startsWith("edit_person") == true,
             onClick = onNavigateToPeople,
-            icon = { Icon(Icons.Default.Person, contentDescription = "People", modifier = Modifier.size(24.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = "People",
+                    modifier = Modifier.size(24.dp)
+                )
+            },
             label = { Text("People") }
         )
         NavigationBarItem(
             selected = currentRoute == "journal",
             onClick = onNavigateToJournal,
-            icon = { Icon(Icons.Default.Book, contentDescription = "Journal", modifier = Modifier.size(24.dp)) },
+            icon = {
+                Icon(
+                    Icons.Default.Book,
+                    contentDescription = "Journal",
+                    modifier = Modifier.size(24.dp)
+                )
+            },
             label = { Text("Journal") }
         )
         NavigationBarItem(

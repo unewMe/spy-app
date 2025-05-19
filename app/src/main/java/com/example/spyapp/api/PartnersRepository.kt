@@ -7,7 +7,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 
 class PartnersRepository {
@@ -19,65 +18,36 @@ class PartnersRepository {
             close(Exception("User not authenticated"))
             return@callbackFlow
         }
-        
-        
+
+
         val partnersRef = firestore.collection(FirestoreCollections.PARTNERS)
             .whereEqualTo("userId", userId)
-            
+
         val subscription = partnersRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
                 close(error)
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                val partners = snapshot.toObjects(Partner::class.java).mapIndexed { index, partner ->
-                    partner.copy(id = snapshot.documents[index].id)
-                }
+                val partners =
+                    snapshot.toObjects(Partner::class.java).mapIndexed { index, partner ->
+                        partner.copy(id = snapshot.documents[index].id)
+                    }
                 trySend(partners).isSuccess
             }
         }
         awaitClose { subscription.remove() }
     }
-    
-    
+
+
     suspend fun getPartnerIds(): List<String> {
         val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
-        
+
         val snapshot = firestore.collection(FirestoreCollections.PARTNERS)
             .whereEqualTo("userId", userId)
             .get()
             .await()
-            
+
         return snapshot.documents.mapNotNull { it.getString("partnerId") }
-    }
-    
-    
-    fun getPartnerIdsFlow(): Flow<List<String>> = callbackFlow {
-        val userId = auth.currentUser?.uid ?: run {
-            close(Exception("User not authenticated"))
-            return@callbackFlow
-        }
-        
-        val partnersRef = firestore.collection(FirestoreCollections.PARTNERS)
-            .whereEqualTo("userId", userId)
-            
-        val subscription = partnersRef.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
-            }
-            if (snapshot != null) {
-                val partnerIds = snapshot.documents.mapNotNull { it.getString("partnerId") }
-                trySend(partnerIds).isSuccess
-            }
-        }
-        awaitClose { subscription.remove() }
-    }
-    
-    
-    suspend fun getAccessibleUserIds(): List<String> {
-        val userId = auth.currentUser?.uid ?: throw Exception("User not authenticated")
-        val partnerIds = getPartnerIds()
-        return listOf(userId) + partnerIds
     }
 }

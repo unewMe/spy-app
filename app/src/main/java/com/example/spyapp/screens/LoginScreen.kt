@@ -1,4 +1,3 @@
-
 package com.example.spyapp.screens
 
 import android.content.Intent
@@ -7,7 +6,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,14 +29,13 @@ import kotlinx.coroutines.CoroutineScope
 
 
 @Composable
-fun LoginScreen( onLoginSuccess: () -> Unit) {
-    val context = LocalContext.current
+fun LoginScreen(onLoginSuccess: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        
+
     }
 
     Column(

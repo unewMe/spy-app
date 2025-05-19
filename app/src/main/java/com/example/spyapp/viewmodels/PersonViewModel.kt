@@ -9,25 +9,26 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
-open class PersonViewModel(private val repository: PersonRepository = PersonRepository()) : ViewModel() {
+open class PersonViewModel(private val repository: PersonRepository = PersonRepository()) :
+    ViewModel() {
     private val _people = MutableStateFlow<List<Person>>(emptyList())
     private val _searchQuery = MutableStateFlow("")
-    
-    
+
+
     val filteredPeople = combine(_people, _searchQuery) { people, query ->
         if (query.isBlank()) {
             people
         } else {
-            people.filter { person -> 
-                person.firstName.contains(query, ignoreCase = true) || 
-                person.lastName.contains(query, ignoreCase = true) ||
-                person.name.contains(query, ignoreCase = true) ||
-                person.email.contains(query, ignoreCase = true)
+            people.filter { person ->
+                person.firstName.contains(query, ignoreCase = true) ||
+                        person.lastName.contains(query, ignoreCase = true) ||
+                        person.name.contains(query, ignoreCase = true) ||
+                        person.email.contains(query, ignoreCase = true)
             }
         }
     }
-    
-    
+
+
     val people: StateFlow<List<Person>> = _people
 
     init {
@@ -37,13 +38,13 @@ open class PersonViewModel(private val repository: PersonRepository = PersonRepo
             }
         }
     }
-    
-    
+
+
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
     }
-    
-    
+
+
     val searchQuery: StateFlow<String> = _searchQuery
 
     fun addPerson(person: Person, onResult: (Boolean, String?) -> Unit) {
@@ -67,8 +68,8 @@ open class PersonViewModel(private val repository: PersonRepository = PersonRepo
             }
         }
     }
-    
-    
+
+
     fun uploadAvatar(personId: String, imageData: ByteArray, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {

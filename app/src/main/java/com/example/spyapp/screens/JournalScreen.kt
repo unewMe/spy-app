@@ -17,6 +17,7 @@ import com.example.spyapp.models.Person
 import com.example.spyapp.viewmodels.JournalViewModel
 import com.example.spyapp.viewmodels.PersonViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.spyapp.components.PersonSelectionDialog
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,7 +42,7 @@ fun JournalScreen(
         matchesQuery && matchesPerson
     }
     if (showPersonDialog) {
-        
+
         PersonSelectionDialog(
             onDismiss = { showPersonDialog = false },
             onPersonSelected = { person ->

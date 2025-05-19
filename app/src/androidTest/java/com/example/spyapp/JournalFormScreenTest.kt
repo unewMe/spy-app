@@ -1,7 +1,13 @@
 package com.example.spyapp
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.hasAnySibling
+import androidx.compose.ui.test.hasParent
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.example.spyapp.api.PersonRepository
 import com.example.spyapp.models.JournalNote
 import com.example.spyapp.models.Person

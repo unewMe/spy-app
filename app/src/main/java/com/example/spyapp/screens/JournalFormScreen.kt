@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.spyapp.components.PersonSelectionDialog
 import com.example.spyapp.models.JournalNote
 import com.example.spyapp.viewmodels.PersonViewModel
 
@@ -235,35 +236,40 @@ fun JournalFormScreen(
             onPersonSelected = { person ->
                 person?.let {
                     if (inHashtagMode && hashtagStartIndex >= 0) {
-                        
+
                         val tag = "#${it.name.replace(" ", "_")}"
-                        
+
                         var endIndex = hashtagStartIndex + 1
                         while (endIndex < content.length && !content[endIndex].isWhitespace()) {
                             endIndex++
                         }
-                        
+
                         val before = content.substring(0, hashtagStartIndex)
-                        val after = if (endIndex < content.length) content.substring(endIndex) else ""
+                        val after =
+                            if (endIndex < content.length) content.substring(endIndex) else ""
                         content = before + tag + " " + after
-                        
-                        
+
+
                         completedHashtags[hashtagStartIndex] = tag
                     } else {
-                        
+
                         val tag = "#${it.name.replace(" ", "_")}"
                         if (!content.contains(tag)) {
-                            val newTag = if (content.isEmpty() || content.endsWith(" ")) tag else " $tag"
+                            val newTag =
+                                if (content.isEmpty() || content.endsWith(" ")) tag else " $tag"
                             content += newTag
                             completedHashtags[content.length - newTag.length] = tag
                         }
                     }
-                    
-                    
+
+
                     if (selectedPersons.none { p -> p.id == it.id }) {
                         selectedPersons = selectedPersons + it
                         selectedPersonIds = selectedPersonIds + it.id
-                        Log.d("JournalFormScreen", "Added person ${it.name} with ID ${it.id}. Total: ${selectedPersonIds.size}")
+                        Log.d(
+                            "JournalFormScreen",
+                            "Added person ${it.name} with ID ${it.id}. Total: ${selectedPersonIds.size}"
+                        )
                     }
                 }
                 showPersonDialog = false

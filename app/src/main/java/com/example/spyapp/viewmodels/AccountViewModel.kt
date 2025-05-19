@@ -7,7 +7,6 @@ import com.example.spyapp.api.InvitationRepository
 import com.example.spyapp.api.PartnersRepository
 import com.example.spyapp.models.Invitation
 import com.example.spyapp.models.Partner
-import com.example.spyapp.models.Person
 import com.example.spyapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,38 +17,37 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class AccountViewModel : ViewModel() {
-    private val auth = FirebaseAuth.getInstance()
     private val partnersRepository = PartnersRepository()
     private val invitationRepository = InvitationRepository()
-    
+
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
-    
+
     private val _partners = MutableStateFlow<List<Partner>>(emptyList())
     val partners: StateFlow<List<Partner>> = _partners.asStateFlow()
-    
+
     private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
     val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
-    
+
     init {
         loadCurrentUser()
         loadPartners()
         loadInvitations()
     }
-    
+
     private fun loadCurrentUser() {
-        
+
         viewModelScope.launch {
             UserSession.currentUser.collectLatest { user ->
                 _currentUser.value = user
             }
         }
     }
-    
+
     private fun loadPartners() {
         viewModelScope.launch {
             partnersRepository.getPartners()
-                .catch { e -> 
+                .catch { e ->
                     Log.e("AccountViewModel", "Error loading partners", e)
                 }
                 .collect { partnersList ->
@@ -57,7 +55,7 @@ class AccountViewModel : ViewModel() {
                 }
         }
     }
-    
+
     private fun loadInvitations() {
         viewModelScope.launch {
             invitationRepository.getInvitations()
@@ -69,7 +67,7 @@ class AccountViewModel : ViewModel() {
                 }
         }
     }
-    
+
     fun addPartner(email: String, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
@@ -81,7 +79,7 @@ class AccountViewModel : ViewModel() {
             }
         }
     }
-    
+
     fun acceptInvitation(invitation: Invitation, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {
@@ -93,7 +91,7 @@ class AccountViewModel : ViewModel() {
             }
         }
     }
-    
+
     fun rejectInvitation(invitation: Invitation, onResult: (Boolean, String?) -> Unit) {
         viewModelScope.launch {
             try {

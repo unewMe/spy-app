@@ -1,15 +1,18 @@
 package com.example.spyapp
 
-import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import com.example.spyapp.models.JournalNote
 import com.example.spyapp.screens.PersonNoteDetailScreen
 import org.junit.Rule
 import org.junit.Test
-import java.text.SimpleDateFormat
-import java.util.*
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class PersonNoteDetailScreenTest {
 
