@@ -30,7 +30,6 @@ fun JournalScreen(
     selectedPerson: Person? = null
 ) {
     val journalViewModel: JournalViewModel = viewModel()
-    val personViewModel: PersonViewModel = viewModel()
     val allNotes by journalViewModel.notes.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var showPersonDialog by remember { mutableStateOf(false) }
