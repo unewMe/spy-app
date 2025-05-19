@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class PersonNoteViewModel(private val personId: String) : ViewModel() {
-    private val repository = JournalRepository()
+class PersonNoteViewModel(
+    private val personId: String,
+    private val repository: JournalRepository = JournalRepository()
+) : ViewModel() {
     private val _notes = MutableStateFlow<List<JournalNote>>(emptyList())
     val notes: StateFlow<List<JournalNote>> = _notes
 

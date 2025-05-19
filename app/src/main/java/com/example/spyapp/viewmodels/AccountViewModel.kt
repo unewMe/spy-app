@@ -8,7 +8,6 @@ import com.example.spyapp.api.PartnersRepository
 import com.example.spyapp.models.Invitation
 import com.example.spyapp.models.Partner
 import com.example.spyapp.models.User
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,9 +15,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class AccountViewModel : ViewModel() {
-    private val partnersRepository = PartnersRepository()
-    private val invitationRepository = InvitationRepository()
+class AccountViewModel(
+    private val partnersRepository: PartnersRepository = PartnersRepository(),
+    private val invitationRepository: InvitationRepository = InvitationRepository(),
+    initialUser: User? = null
+) : ViewModel() {
 
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
@@ -30,7 +31,11 @@ class AccountViewModel : ViewModel() {
     val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
 
     init {
-        loadCurrentUser()
+        if (initialUser != null) {
+            _currentUser.value = initialUser
+        } else {
+            loadCurrentUser()
+        }
         loadPartners()
         loadInvitations()
     }
@@ -74,7 +79,6 @@ class AccountViewModel : ViewModel() {
                 invitationRepository.sendInvitation(email)
                 onResult(true, null)
             } catch (e: Exception) {
-                Log.e("AccountViewModel", "Error sending invitation", e)
                 onResult(false, e.message)
             }
         }
@@ -86,7 +90,6 @@ class AccountViewModel : ViewModel() {
                 invitationRepository.acceptInvitation(invitation)
                 onResult(true, null)
             } catch (e: Exception) {
-                Log.e("AccountViewModel", "Error accepting invitation", e)
                 onResult(false, e.message)
             }
         }
@@ -98,7 +101,6 @@ class AccountViewModel : ViewModel() {
                 invitationRepository.rejectInvitation(invitation)
                 onResult(true, null)
             } catch (e: Exception) {
-                Log.e("AccountViewModel", "Error rejecting invitation", e)
                 onResult(false, e.message)
             }
         }
